@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "LhLfoiLvGhQ5Xnw22rfnpqu8ecdH7zLHESynFZgSB7oA3RnG2WrhQYUtMNgnsr25YONcO8ZtjyPmd/nyk7vXQg==",
+  "dgSpecHash": "EyBLpw8n0t7oXpE3sQH+2G1QikewPc+UatxyX3bW+Hpj807NqFovW5trs4809xtzESGoIQlC0akPu2d12w3upw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Test Discord Bot.csproj",
+  "projectFilePath": "C:\\Users\\matth\\source\\repos\\Discord Bot\\Test Discord Bot.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\matth\\.nuget\\packages\\concurrenthashset\\1.1.0\\concurrenthashset.1.1.0.nupkg.sha512",
     "C:\\Users\\matth\\.nuget\\packages\\dsharpplus\\4.3.0-nightly-01142\\dsharpplus.4.3.0-nightly-01142.nupkg.sha512",

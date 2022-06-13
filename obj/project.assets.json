@@ -4302,11 +4302,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Test Discord Bot.csproj",
+      "projectUniqueName": "C:\\Users\\matth\\source\\repos\\Discord Bot\\Test Discord Bot.csproj",
       "projectName": "Test Discord Bot",
-      "projectPath": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Test Discord Bot.csproj",
+      "projectPath": "C:\\Users\\matth\\source\\repos\\Discord Bot\\Test Discord Bot.csproj",
       "packagesPath": "C:\\Users\\matth\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\obj\\",
+      "outputPath": "C:\\Users\\matth\\source\\repos\\Discord Bot\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
