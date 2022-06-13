@@ -2,8 +2,10 @@
 using System.IO;
 using System.Threading.Tasks;
 using DSharpPlus;
+using DSharpPlus.CommandsNext;
+using Newtonsoft.Json;
 
-namespace DestinyBot
+namespace DiscordBot
 {
     class Program
     {
@@ -20,6 +22,16 @@ namespace DestinyBot
                 TokenType = TokenType.Bot,
                 Intents = DiscordIntents.AllUnprivileged
             });
+
+            var commands = discord.UseCommandsNext(new CommandsNextConfiguration()
+            {
+                StringPrefixes = new[] { "!" }
+            });
+
+            commands.RegisterCommands<PrimaryModule>();
+
+            await discord.ConnectAsync();
+            await Task.Delay(-1);
         }
     }
 }

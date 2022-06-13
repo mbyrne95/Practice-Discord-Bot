@@ -47,6 +47,18 @@
             "DSharpPlus": {
               "target": "Package",
               "version": "[4.3.0-nightly-01142, )"
+            },
+            "DSharpPlus.CommandsNext": {
+              "target": "Package",
+              "version": "[4.3.0-nightly-01142, )"
+            },
+            "DSharpPlus.Interactivity": {
+              "target": "Package",
+              "version": "[4.3.0-nightly-01142, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
             }
           },
           "imports": [

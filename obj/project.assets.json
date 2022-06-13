@@ -2,6 +2,15 @@
   "version": 3,
   "targets": {
     "net6.0": {
+      "ConcurrentHashSet/1.1.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/ConcurrentCollections.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/ConcurrentCollections.dll": {}
+        }
+      },
       "DSharpPlus/4.3.0-nightly-01142": {
         "type": "package",
         "dependencies": {
@@ -22,6 +31,32 @@
           "lib/netstandard2.0/DSharpPlus.dll": {}
         }
       },
+      "DSharpPlus.CommandsNext/4.3.0-nightly-01142": {
+        "type": "package",
+        "dependencies": {
+          "DSharpPlus": "4.3.0-nightly-01142",
+          "Microsoft.Extensions.DependencyInjection": "5.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/DSharpPlus.CommandsNext.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/DSharpPlus.CommandsNext.dll": {}
+        }
+      },
+      "DSharpPlus.Interactivity/4.3.0-nightly-01142": {
+        "type": "package",
+        "dependencies": {
+          "ConcurrentHashSet": "1.1.0",
+          "DSharpPlus": "4.3.0-nightly-01142"
+        },
+        "compile": {
+          "lib/netstandard2.0/DSharpPlus.Interactivity.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/DSharpPlus.Interactivity.dll": {}
+        }
+      },
       "Emzi0767.Common/2.6.2": {
         "type": "package",
         "dependencies": {
@@ -35,6 +70,27 @@
         },
         "runtime": {
           "lib/netcoreapp2.1/Emzi0767.Common.dll": {}
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection/5.0.1": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "5.0.0"
+        },
+        "compile": {
+          "lib/net5.0/Microsoft.Extensions.DependencyInjection.dll": {}
+        },
+        "runtime": {
+          "lib/net5.0/Microsoft.Extensions.DependencyInjection.dll": {}
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions/5.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll": {}
         }
       },
       "Microsoft.Extensions.Logging.Abstractions/5.0.0": {
@@ -1187,6 +1243,23 @@
     }
   },
   "libraries": {
+    "ConcurrentHashSet/1.1.0": {
+      "sha512": "1SuuhZe0wUJbchXdjS23O+quojkw0IXqM9LtUp3RwgQreDI4cj1lfDbdHnD4fOYEnUrftzVIYoonvPlsXm30Bg==",
+      "type": "package",
+      "path": "concurrenthashset/1.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "concurrenthashset.1.1.0.nupkg.sha512",
+        "concurrenthashset.nuspec",
+        "lib/net461/ConcurrentCollections.dll",
+        "lib/net461/ConcurrentCollections.xml",
+        "lib/netstandard1.0/ConcurrentCollections.dll",
+        "lib/netstandard1.0/ConcurrentCollections.xml",
+        "lib/netstandard2.0/ConcurrentCollections.dll",
+        "lib/netstandard2.0/ConcurrentCollections.xml"
+      ]
+    },
     "DSharpPlus/4.3.0-nightly-01142": {
       "sha512": "bWC+aHuXssl5obgF8N7Sb8vDJf3I3YPtGfcXM5cE9e1l3tCu4ZHJivSRQD7XoLPjQclODZ5mxITM5ePSOiMJKA==",
       "type": "package",
@@ -1199,6 +1272,34 @@
         "dsharpplus.png",
         "lib/netstandard2.0/DSharpPlus.dll",
         "lib/netstandard2.0/DSharpPlus.xml"
+      ]
+    },
+    "DSharpPlus.CommandsNext/4.3.0-nightly-01142": {
+      "sha512": "wJS3Z20TQT4hDVafDSmRgBHTUsyutwqzf2u45penw5Wtq0xTvBCIZkCduwrnvx1upnPbgzgDvTAr+t7dFThPDQ==",
+      "type": "package",
+      "path": "dsharpplus.commandsnext/4.3.0-nightly-01142",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "dsharpplus.commandsnext.4.3.0-nightly-01142.nupkg.sha512",
+        "dsharpplus.commandsnext.nuspec",
+        "dsharpplus.png",
+        "lib/netstandard2.0/DSharpPlus.CommandsNext.dll",
+        "lib/netstandard2.0/DSharpPlus.CommandsNext.xml"
+      ]
+    },
+    "DSharpPlus.Interactivity/4.3.0-nightly-01142": {
+      "sha512": "jD9r3eIo41hJoVZX3gQK/Sba33f6zmwGtilz8ARubWWfJOrqyTkCl7noinoc7wfqmGNLL6DcOQKKCGM/3ZRudQ==",
+      "type": "package",
+      "path": "dsharpplus.interactivity/4.3.0-nightly-01142",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "dsharpplus.interactivity.4.3.0-nightly-01142.nupkg.sha512",
+        "dsharpplus.interactivity.nuspec",
+        "dsharpplus.png",
+        "lib/netstandard2.0/DSharpPlus.Interactivity.dll",
+        "lib/netstandard2.0/DSharpPlus.Interactivity.xml"
       ]
     },
     "Emzi0767.Common/2.6.2": {
@@ -1216,6 +1317,50 @@
         "lib/netcoreapp2.1/Emzi0767.Common.xml",
         "lib/netstandard2.0/Emzi0767.Common.dll",
         "lib/netstandard2.0/Emzi0767.Common.xml"
+      ]
+    },
+    "Microsoft.Extensions.DependencyInjection/5.0.1": {
+      "sha512": "//mDNrYeiJ0eh/awFhDFJQzkRVra/njU5Y4fyK7X29g5HScrzbUkKOKlyTtygthcGFt4zNC8G5CFCjb/oizomA==",
+      "type": "package",
+      "path": "microsoft.extensions.dependencyinjection/5.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/Microsoft.Extensions.DependencyInjection.dll",
+        "lib/net461/Microsoft.Extensions.DependencyInjection.xml",
+        "lib/net5.0/Microsoft.Extensions.DependencyInjection.dll",
+        "lib/net5.0/Microsoft.Extensions.DependencyInjection.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.xml",
+        "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.dll",
+        "lib/netstandard2.1/Microsoft.Extensions.DependencyInjection.xml",
+        "microsoft.extensions.dependencyinjection.5.0.1.nupkg.sha512",
+        "microsoft.extensions.dependencyinjection.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "Microsoft.Extensions.DependencyInjection.Abstractions/5.0.0": {
+      "sha512": "ORj7Zh81gC69TyvmcUm9tSzytcy8AVousi+IVRAI8nLieQjOFryRusSFh7+aLk16FN9pQNqJAiMd7BTKINK0kA==",
+      "type": "package",
+      "path": "microsoft.extensions.dependencyinjection.abstractions/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/net461/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml",
+        "microsoft.extensions.dependencyinjection.abstractions.5.0.0.nupkg.sha512",
+        "microsoft.extensions.dependencyinjection.abstractions.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
       ]
     },
     "Microsoft.Extensions.Logging.Abstractions/5.0.0": {
@@ -4144,7 +4289,10 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "DSharpPlus >= 4.3.0-nightly-01142"
+      "DSharpPlus >= 4.3.0-nightly-01142",
+      "DSharpPlus.CommandsNext >= 4.3.0-nightly-01142",
+      "DSharpPlus.Interactivity >= 4.3.0-nightly-01142",
+      "Newtonsoft.Json >= 13.0.1"
     ]
   },
   "packageFolders": {
@@ -4154,9 +4302,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Destiny Discord Bot.csproj",
-      "projectName": "Destiny Discord Bot",
-      "projectPath": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Destiny Discord Bot.csproj",
+      "projectUniqueName": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Test Discord Bot.csproj",
+      "projectName": "Test Discord Bot",
+      "projectPath": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\Test Discord Bot.csproj",
       "packagesPath": "C:\\Users\\matth\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\matth\\source\\repos\\Destiny Discord Bot\\obj\\",
       "projectStyle": "PackageReference",
@@ -4194,6 +4342,18 @@
           "DSharpPlus": {
             "target": "Package",
             "version": "[4.3.0-nightly-01142, )"
+          },
+          "DSharpPlus.CommandsNext": {
+            "target": "Package",
+            "version": "[4.3.0-nightly-01142, )"
+          },
+          "DSharpPlus.Interactivity": {
+            "target": "Package",
+            "version": "[4.3.0-nightly-01142, )"
+          },
+          "Newtonsoft.Json": {
+            "target": "Package",
+            "version": "[13.0.1, )"
           }
         },
         "imports": [
