@@ -11,9 +11,10 @@ namespace DiscordBot
 {
     public class PrimaryModule : BaseCommandModule
     {
-
+        
         string apiKey = System.IO.File.ReadAllText("apiKey.txt");
-        string championText = System.IO.File.ReadAllText(@"champion.json");
+        string championText = System.IO.File.ReadAllText(@"champion.json"); 
+        string championTextCH = System.IO.File.ReadAllText(@"championChinese.json");
         HttpClient client = new HttpClient();
         
         //converts summoner name into encrtyped summoner
@@ -31,20 +32,16 @@ namespace DiscordBot
         }
 
         //converting champion key to champion name
+        //combine keylookups?
         private string keyLookUp(string champKey)
         {
             var jToken = JToken.Parse(championText);
-
             var data = jToken["data"];
-
             var traversal = data.First();
             var count = data.Children().Count();
-
             string myChamp = "";
 
-            //Console.WriteLine(tempnode.ToString());
-            //tempnode = tempnode.First;
-            //Console.Write(data.ToString());
+            //Console.WriteLine(traversal.ToString());
 
             for (int i = 0; i < count; i++)
             {
@@ -61,7 +58,87 @@ namespace DiscordBot
             return "doesn't exist";
         }
 
+        //converting champion key to CH champion name - RETURNS TITLE (name and title reversed in chinese json??)
+        //1 = chinese
+        private string keyLookUp(string champKey, int i)
+        {
+            if (i == 1)
+            {
+                var jToken = JToken.Parse(championTextCH);
+                var data = jToken["data"];
+                var traversal = data.First();
+                var count = data.Children().Count();
+                string myChamp = "";
+
+                //Console.WriteLine(traversal.ToString());
+
+                for (int j = 0; j < count; j++)
+                {
+
+                    if (traversal.First()["key"].ToString().Equals(champKey, StringComparison.OrdinalIgnoreCase))
+                    {
+                        //Console.WriteLine(traversal.ToString());
+                        myChamp += traversal.First()["title"].ToString();
+                        return myChamp;
+                    }
+
+                    traversal = traversal.Next;
+
+                }
+                return "doesn't exist";
+            }
+            return keyLookUp(champKey);
+        }
+        
+
+        //randomizer, wip
+        //to do - add more things to randomize
+        [Command("random")]
+        public async Task randomizer(CommandContext ctx, string toBeRandomized)
+        {
+            if(toBeRandomized.Equals("champion", StringComparison.OrdinalIgnoreCase))
+            {
+                var jToken = JToken.Parse(championText);
+                var data = jToken["data"];
+                var traversal = data.First();
+                var count = data.Children().Count();
+                Random rnd = new Random();
+
+                int range = rnd.Next(0, count);
+
+                for (int i = 0; i < range; i++)
+                {
+                    traversal = traversal.Next;
+                }
+
+                //Console.WriteLine(traversal.ToString());
+                await ctx.RespondAsync(">>> **" + traversal.First()["id"].ToString() + "**");
+            }
+        }
+
+        //add better conventions
+        //fix case sensitivity
+        [Command("chinese")]
+        public async Task chineseName(CommandContext ctx, string champName)
+        {
+            var jToken = JToken.Parse(championText);
+            var data = jToken["data"];
+            var jTokenCH = JToken.Parse(championTextCH);
+            var dataCH = jTokenCH["data"];
+
+            var champContainer = data[champName];
+            string champKey = champContainer["key"].ToString();
+
+            //Console.WriteLine(champKey);
+
+            //Console.WriteLine(champContainer.ToString());
+            await ctx.RespondAsync(">>> " + keyLookUp(champKey, 1).ToString());
+
+            //var champID = data["id"]
+        }
+
         //returns ranked stats of summoner
+        //handle exceptions
         [Command("rank")]
         public async Task rankedInfo(CommandContext ctx, [RemainingText]string summonerName)
         {
@@ -94,6 +171,7 @@ namespace DiscordBot
         }
 
         //returns top 3 champion mastery
+        //handle exceptions
         [Command("mastery")]
         public async Task championMastery(CommandContext ctx, [RemainingText] string summonerName)
         {

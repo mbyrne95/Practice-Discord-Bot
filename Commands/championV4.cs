@@ -18,7 +18,5 @@ namespace DiscordBot
         public int? tokensEarned { get; set; }
         public string? summonerId { get; set; }
 
-
-
     }
 }

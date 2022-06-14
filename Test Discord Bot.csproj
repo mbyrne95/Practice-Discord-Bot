@@ -13,6 +13,8 @@
     <PackageReference Include="DSharpPlus.CommandsNext" Version="4.3.0-nightly-01142" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="4.3.0-nightly-01142" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
 
 </Project>
