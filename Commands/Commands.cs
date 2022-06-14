@@ -7,7 +7,7 @@ using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
+using DSharpPlus.Entities;
 
 namespace DiscordBot
 {
@@ -34,7 +34,6 @@ namespace DiscordBot
         }
 
         //converting champion key to champion name
-        //combine keylookups?
         private string keyToName(string champKey)
         {
             var jToken = JToken.Parse(championText);
@@ -117,19 +116,47 @@ namespace DiscordBot
                 //Console.WriteLine(traversal.ToString());
                 await ctx.RespondAsync(">>> **" + traversal.First()["id"].ToString() + "**");
             }
+            else if (toBeRandomized.Equals("profile", StringComparison.OrdinalIgnoreCase) || toBeRandomized.Equals("avi", StringComparison.OrdinalIgnoreCase)
+                || toBeRandomized.Equals("icon", StringComparison.OrdinalIgnoreCase))
+            {
+                Random rnd = new Random();
+                int fCount = Directory.GetFiles("profileicon/", "*", SearchOption.TopDirectoryOnly).Length;
+                int iconNumber = rnd.Next(0, fCount);
+
+                string icon = "profileicon/" + iconNumber.ToString() + ".png";
+
+                using (var fs = new FileStream(icon, FileMode.Open, FileAccess.Read))
+                {
+                    var msg = await new DiscordMessageBuilder()
+                        .WithContent("")
+                        .WithReply(ctx.Message.Id)
+                        .WithFiles(new Dictionary<string, Stream>() { { icon, fs } })
+                        .SendAsync(ctx.Channel);
+                }
+            }
+            else
+            {
+                await ctx.RespondAsync(">>> Not a valid command! Try: **champion, icon**.");
+            }
         }
 
         //add better conventions
-        //fix case sensitivity
         [Command("chinese")]
-        public async Task chineseName(CommandContext ctx, string champName)
+        public async Task chineseName(CommandContext ctx, [RemainingText] string champName)
         {
             var jToken = JToken.Parse(championText);
             var data = jToken["data"];
             var jTokenCH = JToken.Parse(championTextCH);
             var dataCH = jTokenCH["data"];
+            string cleanedName = CleanString.RemoveCharacters(CleanString.RemoveSpace(champName));
 
-            var temp = ((JObject)data).GetValue(champName, StringComparison.OrdinalIgnoreCase);
+            //Console.WriteLine(cleanedName);
+            if (((JObject)data).GetValue(cleanedName, StringComparison.OrdinalIgnoreCase) == null)
+            {
+                await ctx.RespondAsync(">>> Not a valid champion.");
+                return;
+            }
+            var temp = ((JObject)data).GetValue(cleanedName, StringComparison.OrdinalIgnoreCase);
             //Console.WriteLine(temp.ToString());
             //var champContainer = data[champName];
             string champKey = temp["key"].ToString();
@@ -146,6 +173,12 @@ namespace DiscordBot
         public async Task rankedInfo(CommandContext ctx, [RemainingText]string summonerName)
         {
             string encryptedSummoner = RetrieveEncryptedSummoner(summonerName);
+
+            if (encryptedSummoner == null)
+            {
+                await ctx.RespondAsync(">>> Not a valid summoner.");
+                return;
+            }
 
             var leagueEndpoint = "https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/" + encryptedSummoner + "?api_key=" + apiKey;
             var leagueResult = client.GetAsync(leagueEndpoint).Result;
@@ -174,11 +207,16 @@ namespace DiscordBot
         }
 
         //returns top 3 champion mastery
-        //handle exceptions
         [Command("mastery")]
         public async Task championMastery(CommandContext ctx, [RemainingText] string summonerName)
         {
             string encryptedSummoner = RetrieveEncryptedSummoner(summonerName);
+
+            if (encryptedSummoner == null)
+            {
+                await ctx.RespondAsync(">>> Not a valid summoner.");
+                return;
+            }
 
             var championEndpoint = "https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/" + encryptedSummoner + "?api_key=" + apiKey;
             var championResult = client.GetAsync(championEndpoint).Result;
@@ -198,7 +236,6 @@ namespace DiscordBot
             await ctx.RespondAsync(">>> " + info);
         }
 
-        
         /*
         [Command("test")]
         public async Task championtest(CommandContext ctx, string thischampion)
