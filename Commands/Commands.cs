@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System;
 using System.Threading.Tasks;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+
 
 namespace DiscordBot
 {
@@ -17,7 +19,7 @@ namespace DiscordBot
         string championTextCH = System.IO.File.ReadAllText(@"championChinese.json");
         HttpClient client = new HttpClient();
         
-        //converts summoner name into encrtyped summoner
+        //converts summoner name into encrypted summoner
         private string RetrieveEncryptedSummoner(string summonerName)
         {
             var endpoint = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + apiKey;
@@ -33,7 +35,7 @@ namespace DiscordBot
 
         //converting champion key to champion name
         //combine keylookups?
-        private string keyLookUp(string champKey)
+        private string keyToName(string champKey)
         {
             var jToken = JToken.Parse(championText);
             var data = jToken["data"];
@@ -60,7 +62,7 @@ namespace DiscordBot
 
         //converting champion key to CH champion name - RETURNS TITLE (name and title reversed in chinese json??)
         //1 = chinese
-        private string keyLookUp(string champKey, int i)
+        private string keyToName(string champKey, int i)
         {
             if (i == 1)
             {
@@ -87,9 +89,10 @@ namespace DiscordBot
                 }
                 return "doesn't exist";
             }
-            return keyLookUp(champKey);
+            return keyToName(champKey);
         }
         
+
 
         //randomizer, wip
         //to do - add more things to randomize
@@ -126,13 +129,13 @@ namespace DiscordBot
             var jTokenCH = JToken.Parse(championTextCH);
             var dataCH = jTokenCH["data"];
 
-            var champContainer = data[champName];
-            string champKey = champContainer["key"].ToString();
-
+            var temp = ((JObject)data).GetValue(champName, StringComparison.OrdinalIgnoreCase);
+            //Console.WriteLine(temp.ToString());
+            //var champContainer = data[champName];
+            string champKey = temp["key"].ToString();
             //Console.WriteLine(champKey);
-
             //Console.WriteLine(champContainer.ToString());
-            await ctx.RespondAsync(">>> " + keyLookUp(champKey, 1).ToString());
+            await ctx.RespondAsync(">>> " + temp["id"].ToString() + " - **" + keyToName(champKey, 1).ToString() + "**");
 
             //var champID = data["id"]
         }
@@ -189,7 +192,7 @@ namespace DiscordBot
                 if (championInfo[i] != null)
                 {
                     var champion = championInfo[i];
-                    info += "\n   **" + keyLookUp(champion.championId.ToString()) + "** - " + champion.championPoints + " mastery points.";
+                    info += "\n   **" + keyToName(champion.championId.ToString()) + "** - " + champion.championPoints + " mastery points.";
                 }
             }
             await ctx.RespondAsync(">>> " + info);
