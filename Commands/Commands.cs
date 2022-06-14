@@ -5,6 +5,7 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DiscordBot
 {
@@ -12,8 +13,10 @@ namespace DiscordBot
     {
 
         string apiKey = System.IO.File.ReadAllText("apiKey.txt");
+        string championText = System.IO.File.ReadAllText(@"champion.json");
         HttpClient client = new HttpClient();
         
+        //converts summoner name into encrtyped summoner
         private string RetrieveEncryptedSummoner(string summonerName)
         {
             var endpoint = "https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + apiKey;
@@ -26,7 +29,39 @@ namespace DiscordBot
 
             return encryptedSummoner;
         }
-        
+
+        //converting champion key to champion name
+        private string keyLookUp(string champKey)
+        {
+            var jToken = JToken.Parse(championText);
+
+            var data = jToken["data"];
+
+            var traversal = data.First();
+            var count = data.Children().Count();
+
+            string myChamp = "";
+
+            //Console.WriteLine(tempnode.ToString());
+            //tempnode = tempnode.First;
+            //Console.Write(data.ToString());
+
+            for (int i = 0; i < count; i++)
+            {
+
+                if (traversal.First()["key"].ToString().Equals(champKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    myChamp += traversal.First()["id"].ToString();
+                    return myChamp;
+                }
+
+                traversal = traversal.Next;
+
+            }
+            return "doesn't exist";
+        }
+
+        //returns ranked stats of summoner
         [Command("rank")]
         public async Task rankedInfo(CommandContext ctx, [RemainingText]string summonerName)
         {
@@ -58,6 +93,7 @@ namespace DiscordBot
             }
         }
 
+        //returns top 3 champion mastery
         [Command("mastery")]
         public async Task championMastery(CommandContext ctx, [RemainingText] string summonerName)
         {
@@ -75,11 +111,36 @@ namespace DiscordBot
                 if (championInfo[i] != null)
                 {
                     var champion = championInfo[i];
-                    info += "\n   **" + champion.championId + "** - " + champion.championPoints + " mastery points.";
+                    info += "\n   **" + keyLookUp(champion.championId.ToString()) + "** - " + champion.championPoints + " mastery points.";
                 }
             }
             await ctx.RespondAsync(">>> " + info);
         }
+
+        
+        /*
+        [Command("test")]
+        public async Task championtest(CommandContext ctx, string thischampion)
+        {
+            string championText = System.IO.File.ReadAllText(@"champion.json");
+
+            dynamic jToken = JToken.Parse(championText);
+
+            var data = jToken["data"];
+
+            var champ = ((JObject)data).GetValue(thischampion, StringComparison.OrdinalIgnoreCase);
+            var title = champ["title"];
+
+            if (champ == null)
+            {
+                Console.WriteLine("doesn't exist");
+            } 
+            else
+            {
+                Console.WriteLine(title.ToString());
+            }
+        }
+        */
 
     }
 }
