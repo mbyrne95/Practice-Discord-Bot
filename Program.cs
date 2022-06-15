@@ -30,6 +30,7 @@ namespace DiscordBot
             });
 
             commands.RegisterCommands<PrimaryModule>();
+            commands.SetHelpFormatter<HelpFormatter>();
 
             await discord.ConnectAsync();
             await Task.Delay(-1);
