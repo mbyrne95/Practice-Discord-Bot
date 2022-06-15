@@ -116,7 +116,71 @@ namespace DiscordBot
             return name.name;
         }
 
+        //hard coded relative to https://static.developer.riotgames.com/docs/lol/queues.json (6/15)
+        private string getQueueType(string id)
+        {
+            switch (id)
+            {
+                case "400":
+                    return "5v5 Draft Pick";
+                    break;
+                case "420":
+                    return "5v5 Ranked Solo";
+                    break;
+                case "430":
+                    return "5v5 Blind Pick";
+                    break;
+                case "440":
+                    return "5v5 Ranked Flex";
+                    break;
+                case "450":
+                    return "5v5 ARAM";
+                    break;
+                default: return "Summoner's Rift";
+            }
+        }
 
+        //returns the "serveremoji" version of the respective summoner - needs to be edited relative to server info
+        private string getSummonerSpell(string id)
+        {
+            switch (id)
+            {
+                case "21":
+                    return "<:Barrier:986740464281600030>";
+                    break;
+                case "1":
+                    return "<:Cleanse:986740465233694770>";
+                    break;
+                case "14":
+                    return "<:Ignite:986740465908998274>";
+                    break;
+                case "3":
+                    return "<:Exhaust:986740466726871090>";
+                    break;
+                case "4":
+                    return "<:Flash:986740467297316875>";
+                    break;
+                case "6":
+                    return "<:Ghost:986740468794683422>";
+                    break;
+                case "7":
+                    return "<:Heal:986740470099116082>";
+                    break;
+                case "13":
+                    return "<:Clarity:986740471273488484>";
+                    break;
+                case "11":
+                    return "<:Smite:986740472187850752>";
+                    break;
+                case "32":
+                    return "<:Snowball:986740472930250832>";
+                    break;
+                case "39":
+                    return "<:Snowball:986740472930250832>";
+                    break;
+                default: return "Unknown";
+            }
+        }
 
         //randomizer, wip
         //to do - add more things to randomize
@@ -202,7 +266,7 @@ namespace DiscordBot
             {
                 //await ctx.RespondAsync(">>> Not a valid champion.");
                 var msgEmbedFail = new DiscordEmbedBuilder();
-                msgEmbedFail.Color = DiscordColor.Red;
+                msgEmbedFail.Color = DiscordColor.Black;
                 msgEmbedFail.Description = "*Not a valid champion.*";
                 msgEmbedFail.Title = "Error";
                 msgEmbedFail.Build();
@@ -238,7 +302,7 @@ namespace DiscordBot
                 //await ctx.RespondAsync(">>> Not a valid summoner.");
                 
                 var msgEmbed = new DiscordEmbedBuilder();
-                msgEmbed.Color = DiscordColor.Red;
+                msgEmbed.Color = DiscordColor.Black;
                 msgEmbed.Description = "*Not a valid summoner.*";
                 msgEmbed.Title = "Error";
                 msgEmbed.Build();
@@ -306,7 +370,7 @@ namespace DiscordBot
             {
                 //await ctx.RespondAsync(">>> Not a valid summoner.");
                 var msgEmbedFail = new DiscordEmbedBuilder();
-                msgEmbedFail.Color = DiscordColor.Red;
+                msgEmbedFail.Color = DiscordColor.Black;
                 msgEmbedFail.Description = "*Not a valid summoner.*";
                 msgEmbedFail.Title = "Error";
                 msgEmbedFail.Build();
@@ -348,6 +412,8 @@ namespace DiscordBot
         }
 
         //returns last game info of given summoner
+        //data to pull: item build, skill order
+        //currently pulling: gamemode, champion, k/d/a, win or lose
         [Command("last")]
         public async Task lastGame(CommandContext ctx, [RemainingText] string summonerName)
         {
@@ -357,13 +423,13 @@ namespace DiscordBot
             {
                 //await ctx.RespondAsync(">>> Not a valid summoner.");
 
-                var msgEmbed = new DiscordEmbedBuilder();
-                msgEmbed.Color = DiscordColor.Red;
-                msgEmbed.Description = "*Not a valid summoner.*";
-                msgEmbed.Title = "Error";
-                msgEmbed.Build();
-
-                await ctx.RespondAsync(msgEmbed);
+                var msgEmbedFail = new DiscordEmbedBuilder() {
+                    Color = DiscordColor.Black,
+                    Description = "*Not a valid summoner.*",
+                    Title = "Error",
+                };
+                msgEmbedFail.Build();
+                await ctx.RespondAsync(msgEmbedFail);
 
                 return;
             }
@@ -376,15 +442,136 @@ namespace DiscordBot
             var leagueJson = leagueResult.Content.ReadAsStringAsync().Result;
             var matchName = JsonConvert.DeserializeObject<String[]>(leagueJson);
             string matchId = matchName[0].ToString();
-            
-            Console.WriteLine(matchId);
+
+            //Console.WriteLine(matchId);
 
             var matchEndpoint = "https://americas.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + apiKey;
             var matchResult = client.GetAsync(matchEndpoint).Result;
             var matchJson = matchResult.Content.ReadAsStringAsync().Result;
-            var matchInfo = JsonConvert.DeserializeObject(matchJson);
+            var matchInfo = (JObject)JsonConvert.DeserializeObject(matchJson);
 
-            Console.WriteLine(matchInfo);
+            var infoBucket = matchInfo.Children().First();
+            infoBucket = infoBucket.Next;
+            var participantBucket = infoBucket.Children()["participants"].Children().First();
+
+            string gameMode = getQueueType(infoBucket.Children()["queueId"].First().ToString());
+
+            for (int i = 0; i < infoBucket.Children()["participants"].Children().Count(); i++)
+            {
+
+                //Console.WriteLine(infoBucket.Children()["participants"].Children().Count().ToString());
+                var participantPUUID = participantBucket["puuid"].ToString();
+                //Console.WriteLine(participantPUUID.ToString());
+
+
+                if (puuid == participantPUUID)
+                {
+                    break;
+                }
+
+                participantBucket = participantBucket.Next;
+            }
+
+            string assists = participantBucket["assists"].ToString();
+            string deaths = participantBucket["deaths"].ToString();
+            string kills = participantBucket["kills"].ToString();
+
+            string kda = kills + "/" + deaths + "/" + assists;
+            string champName = participantBucket["championName"].ToString();
+
+            string winData = participantBucket["win"].ToString();
+            bool win = true;
+            var thisColor = DiscordColor.Blurple;
+
+            if (winData.Equals("false", StringComparison.OrdinalIgnoreCase))
+            {
+                thisColor = DiscordColor.Red;
+                win = false;
+            }
+
+            string description = "Win! :partying_face:";
+            if (!win)
+            {
+                description = "Loss! :persevere:";
+            }
+
+            var msgEmbed = new DiscordEmbedBuilder() {
+                
+                Color = thisColor,
+                Description = description,
+                Title = getProperName(summonerName) + "'s Last Game:",
+                Thumbnail = new DiscordEmbedBuilder.EmbedThumbnail
+                {
+                    Url = "https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/" + champName + "_0.jpg"
+                }
+            };
+
+            /*
+            string fieldDescription = "KDA: " + kda +
+                "\nChampion Level: " + participantBucket["champLevel"].ToString() +
+                "\n\nVision Score: " + participantBucket["visionScore"].ToString() +
+                "\nWards Placed: " + participantBucket["wardsPlaced"].ToString() +
+                "\nWards Killed: " + participantBucket["wardsKilled"].ToString();
+            */
+
+            string fieldDescriptor = "";
+            string fieldValues = "";
+
+            string fieldDescriptorBase = "Champion Level: " + 
+                "\nKDA: " +
+                "\nLargest MultiKill: " +
+                "\n\nVision Score: " + 
+                "\nWards Placed: " + 
+                "\nWards Killed: ";
+
+            string fieldValuesBase = participantBucket["champLevel"].ToString() + "\n" + 
+                kda + "\n" +
+                participantBucket["largestMultiKill"].ToString() + "\n\n" +
+                participantBucket["visionScore"].ToString() + "\n" +
+                participantBucket["wardsPlaced"].ToString() + "\n" +
+                participantBucket["wardsKilled"].ToString();
+
+            string summonerSpells = getSummonerSpell(participantBucket["summoner1Id"].ToString()) + " " +
+                getSummonerSpell(participantBucket["summoner2Id"].ToString());
+
+            msgEmbed.AddField("Champion:", champName, true);
+            msgEmbed.AddField("Game Mode:", gameMode, true);
+            msgEmbed.AddField("Summoner Spells:", summonerSpells, false);
+            
+            if (participantBucket["firstBloodKill"].ToString().Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                fieldDescriptor += "**First Blood!**\n";
+                fieldValues += "\u200b\n";
+            }
+            if (participantBucket["firstTowerKill"].ToString().Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                participantBucket["firstTowerAssist"].ToString().Equals("true", StringComparison.OrdinalIgnoreCase))
+            {
+                fieldDescriptor += "**First Tower!**\n";
+                fieldValues += "\u200b\n";
+            }
+
+            fieldDescriptor += fieldDescriptorBase;
+            fieldValues += fieldValuesBase;
+
+            msgEmbed.AddField("Info:", fieldDescriptor, true);
+            msgEmbed.AddField("\u200b", fieldValues, true);
+
+            msgEmbed.Build();
+
+            //Console.Write(DiscordGuild.Emojis.ToString());
+
+            await ctx.RespondAsync(msgEmbed);
+
+            //Console.WriteLine(champName + " " + win);
+
+            //string gameMode = participantBucket[""].ToString();
+
+
+            //Console.WriteLine(participantBucketPUUID.ToString());
+
+            //string gameMode = infoBucket.Children()["gameMode"].ToString();
+
+            //Console.WriteLine(positionInQuery);
 
             /*
             string info = "";
