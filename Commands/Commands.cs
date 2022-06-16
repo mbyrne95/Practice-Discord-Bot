@@ -8,6 +8,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using DSharpPlus.Entities;
+using System.Net;
 
 namespace DiscordBot
 {
@@ -166,6 +167,9 @@ namespace DiscordBot
                 case "7":
                     return "<:Heal:986740470099116082>";
                     break;
+                case "12":
+                    return "<:Teleport:986855983559081984>";
+                    break;
                 case "13":
                     return "<:Clarity:986740471273488484>";
                     break;
@@ -180,6 +184,55 @@ namespace DiscordBot
                     break;
                 default: return "Unknown";
             }
+        }
+
+        
+        //wip, turn item id into name
+        //will become private method when complete
+        [Command("test")]
+        public async Task itemIdtoName(CommandContext ctx)
+        {
+            String[] items = new String[6];
+            String[] itemName = new String[6];
+
+            /*
+            var json = new WebClient().DownloadString("http://ddragon.leagueoflegends.com/cdn/12.11.1/data/en_US/item.json");
+            var itemJson = JsonConvert.DeserializeObject(json);
+            var itemJsonitemJObject = (JObject)JsonConvert.DeserializeObject(json);
+            var itemBucket = itemJsonitemJObject.Children().First().Next.Next.Next;
+            //var itemContainer = itemBucket.Children().First();
+
+            using (var reader = new JsonTextReader(new StringReader(json)))
+            {
+                while (reader.Read())
+                {
+                    for (int i = 0; i < itemBucket.Children().Count(); i++)
+                    {
+                        for (int j = 0; j < items.Length; j++)
+                        {
+                            if (items[j] == reader.Value)
+                            {
+                                itemName[j] =
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            */
+
+            //
+
+
+            /*
+            for (int i = 0; i < itemBucket.Children().Count(); i++)
+            {
+                if itemContainer[""]
+            }
+            */
+            //Console.WriteLine(itemContainer[""].ToString());
         }
 
         //randomizer, wip
@@ -412,17 +465,15 @@ namespace DiscordBot
         }
 
         //returns last game info of given summoner
-        //data to pull: item build, skill order
-        //currently pulling: gamemode, champion, k/d/a, win or lose
+        //data to add: item build, skill order
         [Command("last")]
         public async Task lastGame(CommandContext ctx, [RemainingText] string summonerName)
         {
             string puuid = RetrievePUUID(summonerName);
 
+            //check null condition
             if (puuid == null || puuid == "")
             {
-                //await ctx.RespondAsync(">>> Not a valid summoner.");
-
                 var msgEmbedFail = new DiscordEmbedBuilder() {
                     Color = DiscordColor.Black,
                     Description = "*Not a valid summoner.*",
@@ -434,22 +485,20 @@ namespace DiscordBot
                 return;
             }
 
-            //HttpClient client = new HttpClient();
-            //Console.WriteLine(puuid);
-
+            //getting match name
             var leagueEndpoint = "https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids?start=0&count=20&api_key=" + apiKey;
             var leagueResult = client.GetAsync(leagueEndpoint).Result;
             var leagueJson = leagueResult.Content.ReadAsStringAsync().Result;
             var matchName = JsonConvert.DeserializeObject<String[]>(leagueJson);
             string matchId = matchName[0].ToString();
 
-            //Console.WriteLine(matchId);
-
+            //getting match info
             var matchEndpoint = "https://americas.api.riotgames.com/lol/match/v5/matches/" + matchId + "?api_key=" + apiKey;
             var matchResult = client.GetAsync(matchEndpoint).Result;
             var matchJson = matchResult.Content.ReadAsStringAsync().Result;
             var matchInfo = (JObject)JsonConvert.DeserializeObject(matchJson);
 
+            //navigating to champion bucket
             var infoBucket = matchInfo.Children().First();
             infoBucket = infoBucket.Next;
             var participantBucket = infoBucket.Children()["participants"].Children().First();
@@ -459,10 +508,7 @@ namespace DiscordBot
             for (int i = 0; i < infoBucket.Children()["participants"].Children().Count(); i++)
             {
 
-                //Console.WriteLine(infoBucket.Children()["participants"].Children().Count().ToString());
                 var participantPUUID = participantBucket["puuid"].ToString();
-                //Console.WriteLine(participantPUUID.ToString());
-
 
                 if (puuid == participantPUUID)
                 {
@@ -472,6 +518,7 @@ namespace DiscordBot
                 participantBucket = participantBucket.Next;
             }
 
+            //getting data
             string assists = participantBucket["assists"].ToString();
             string deaths = participantBucket["deaths"].ToString();
             string kills = participantBucket["kills"].ToString();
@@ -483,6 +530,11 @@ namespace DiscordBot
             bool win = true;
             var thisColor = DiscordColor.Blurple;
 
+            //item build
+            String[] itemBuild = { participantBucket["item0"].ToString(), participantBucket["item1"].ToString(), participantBucket["item2"].ToString(),
+                participantBucket["item3"].ToString(), participantBucket["item4"].ToString(), participantBucket["item5"].ToString() };
+
+            //checking win condition
             if (winData.Equals("false", StringComparison.OrdinalIgnoreCase))
             {
                 thisColor = DiscordColor.Red;
@@ -495,6 +547,8 @@ namespace DiscordBot
                 description = "Loss! :persevere:";
             }
 
+            //MESSAGE BUILDING
+
             var msgEmbed = new DiscordEmbedBuilder() {
                 
                 Color = thisColor,
@@ -506,19 +560,12 @@ namespace DiscordBot
                 }
             };
 
-            /*
-            string fieldDescription = "KDA: " + kda +
-                "\nChampion Level: " + participantBucket["champLevel"].ToString() +
-                "\n\nVision Score: " + participantBucket["visionScore"].ToString() +
-                "\nWards Placed: " + participantBucket["wardsPlaced"].ToString() +
-                "\nWards Killed: " + participantBucket["wardsKilled"].ToString();
-            */
-
             string fieldDescriptor = "";
             string fieldValues = "";
 
-            string fieldDescriptorBase = "Champion Level: " + 
+            string fieldDescriptorBase = "Level: " + 
                 "\nKDA: " +
+                "\nTotal Gold: " +
                 "\nLargest MultiKill: " +
                 "\n\nVision Score: " + 
                 "\nWards Placed: " + 
@@ -526,6 +573,7 @@ namespace DiscordBot
 
             string fieldValuesBase = participantBucket["champLevel"].ToString() + "\n" + 
                 kda + "\n" +
+                participantBucket["goldEarned"].ToString() + "\n" +
                 participantBucket["largestMultiKill"].ToString() + "\n\n" +
                 participantBucket["visionScore"].ToString() + "\n" +
                 participantBucket["wardsPlaced"].ToString() + "\n" +
@@ -558,88 +606,8 @@ namespace DiscordBot
 
             msgEmbed.Build();
 
-            //Console.Write(DiscordGuild.Emojis.ToString());
-
             await ctx.RespondAsync(msgEmbed);
 
-            //Console.WriteLine(champName + " " + win);
-
-            //string gameMode = participantBucket[""].ToString();
-
-
-            //Console.WriteLine(participantBucketPUUID.ToString());
-
-            //string gameMode = infoBucket.Children()["gameMode"].ToString();
-
-            //Console.WriteLine(positionInQuery);
-
-            /*
-            string info = "";
-
-            if (leagueInfo.Count == 0 || leagueInfo == null)
-            {
-                //info = summonerName + ":";
-                //await ctx.RespondAsync(">>> " + info + "\n   *This user does not have any ranked data.*");
-
-
-                var msgEmbed = new DiscordEmbedBuilder();
-                msgEmbed.Color = DiscordColor.Red;
-                msgEmbed.Description = "*This user does not have any ranked data.*";
-                msgEmbed.Title = getProperName(summonerName) + "'s Ranked Info";
-                msgEmbed.Build();
-
-                await ctx.RespondAsync(msgEmbed);
-
-            }
-            else
-            {
-                //info += leagueInfo[0].summonerName + ":";
-                for (int i = 0; i < leagueInfo.Count; i++)
-                {
-                    var league = leagueInfo[i];
-                    double wr = Math.Round((((double)league.wins / ((double)league.wins + (double)league.losses)) * 100), 2);
-
-                    info += "\n   *" + CleanString.RegexClean(league.queueType) + "* - **" + CleanString.RegexClean(league.tier) + " " + CleanString.RegexClean(league.rank) + "** (wr: " + wr + "%)";
-                }
-                //await ctx.RespondAsync(">>> " + info);
-
-                var msgEmbed = new DiscordEmbedBuilder();
-                msgEmbed.Color = DiscordColor.Blurple;
-                msgEmbed.Description = info;
-                msgEmbed.Title = leagueInfo[0].summonerName + "'s Ranked Info";
-                msgEmbed.Build();
-
-                await ctx.RespondAsync(msgEmbed);
-
-            }
-            */
-
-
         }
-
-        /*
-        [Command("test")]
-        public async Task championtest(CommandContext ctx, string thischampion)
-        {
-            string championText = System.IO.File.ReadAllText(@"champion.json");
-
-            dynamic jToken = JToken.Parse(championText);
-
-            var data = jToken["data"];
-
-            var champ = ((JObject)data).GetValue(thischampion, StringComparison.OrdinalIgnoreCase);
-            var title = champ["title"];
-
-            if (champ == null)
-            {
-                Console.WriteLine("doesn't exist");
-            } 
-            else
-            {
-                Console.WriteLine(title.ToString());
-            }
-        }
-        */
-
     }
 }
